@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario y Descarga de Firma</title>
+    <link href="https://firmaj.s3.eu-west-3.amazonaws.com/se.css" rel="stylesheet">
+
+    <style>
+        @font-face {
+            font-family: 'Switzer-Black';
+            src: url('https://firmaj.s3.eu-west-3.amazonaws.com/WEB/fonts/Switzer-Black.woff2') format('woff2');
+            font-weight: 900; /* Ajusta el peso a 900 que corresponde a 'Black' */
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Switzer-Extrabold';
+            src: url('https://firmaj.s3.eu-west-3.amazonaws.com/WEB/fonts/Switzer-Extrabold.woff2') format('woff2');
+            font-weight: 800; /* Ajusta el peso a 800 que corresponde a 'Extrabold' */
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Switzer-Regular';
+            src: url('https://firmaj.s3.eu-west-3.amazonaws.com/WEB/fonts/Switzer-Regular.woff2') format('woff2');
+            font-weight: 400; /* Ajusta el peso a 400 que corresponde a 'Regular' */
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Switzer-Regular', sans-serif;
+            text-align: center;
+        }
+        #result-image {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <form id="myForm">
+        <label for="nombre">Dime el nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br>
+
+        <label for="apellido">Dime el apellido:</label>
+        <input type="text" id="apellido" name="apellido" required><br>
+
+        <label for="puesto">Dime el puesto:</label>
+        <input type="text" id="puesto" name="puesto" required><br>
+
+        <label for="correo">Dime el correo:</label>
+        <input type="email" id="correo" name="correo" required><br>
+
+        <label for="teléfono">Dime el teléfono:</label>
+        <input type="text" id="tel" name="tel" required><br>
+
+        <label for="movil">Dime el número de móvil:</label>
+        <input type="text" id="mov" name="mov" required><br>
+
+        <label for="imagenFondo">Selecciona una imagen de fondo:</label>
+        <input type="file" id="imagenFondo" accept="image/*"><br>
+
+        <button type="button" onclick="generarFirma()">Descargar Firma</button>
+    </form>
+
+    <div id="result">
+        <img id="result-image" alt="Firma generada">
+    </div>
+
+    <script>
+        function generarFirma() {
+            // Obtener datos del formulario
+            var nombre = document.getElementById("nombre").value;
+            var apellido = document.getElementById("apellido").value;
+            var puesto = document.getElementById("puesto").value;
+            var correo = document.getElementById("correo").value;
+            var movil = document.getElementById("mov").value;
+            var telefono = document.getElementById("tel").value;
+
+            // Obtener la imagen de fondo seleccionada
+            var input = document.getElementById("imagenFondo");
+            var file = input.files[0];
+
+            // Crear un lienzo temporal para superponer el texto y la imagen de fondo
+            var canvas = document.createElement("canvas");
+            var context = canvas.getContext("2d");
+
+            // Configurar el lienzo con el tamaño deseado
+            canvas.width = 600;  // Ancho cuadro firma
+            canvas.height = 140;  // Altura cuadro firma
+
+            // Cargar la imagen de fondo
+            var img = new Image();
+            img.onload = function() {
+                // Dibujar la imagen de fondo
+                context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                // Agregar el texto superpuesto
+                context.font = "20px 'Switzer-Black'";
+                context.fillStyle = "#00953B";  
+                context.fillText(nombre, 200, 40);
+                context.fillText(apellido, 200, 60);
+                context.font = "10px 'Switzer-Extrabold'";
+                context.fillStyle = "#000000";
+                context.fillText(puesto, 200, 80);
+                context.font = "10px 'Switzer-Regular'";
+                context.fillStyle = "#000000";
+                context.fillText(correo, 200, 100);
+                context.fillText(telefono, 200, 120);
+                context.fillText(movil, 200, 130);
+
+                // Mostrar la firma generada
+                var resultImage = document.getElementById("result-image");
+                resultImage.src = canvas.toDataURL();
+
+                // Descargar la firma
+                var link = document.createElement('a');
+                link.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                link.download = 'firma.png';
+                link.click();
+            };
+
+            // Leer la imagen de fondo seleccionada
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+
+</body>
+</html>
